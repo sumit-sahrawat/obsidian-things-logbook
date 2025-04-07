@@ -55,10 +55,12 @@ export class LogbookRenderer {
     for (const line of lines) {
       const isEmpty = line.trim() === "";
 
-      if (isEmpty && !previousWasEmpty) {
-        // only push one empty line for consecutive ones
-        result.push("");
-        previousWasEmpty = true;
+      if (isEmpty) {
+        if (!previousWasEmpty) {
+          // only push one empty line for consecutive ones
+          result.push("");
+          previousWasEmpty = true;
+        }
       } else {
         result.push(line);
         previousWasEmpty = false;
