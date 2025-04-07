@@ -13,7 +13,10 @@ export interface ISettings {
 
   doesSyncNoteBody: boolean;
   doesSyncProject: boolean;
+  doesCollapseEmptyLines: boolean;
+  doesAddNewlineAfterSectionHeading: boolean;
   doesAddNewlineBeforeHeadings: boolean;
+  doesAddNewlineAfterHeadings: boolean;
   isSyncEnabled: boolean;
   sectionHeading: string;
   syncInterval: number;
@@ -27,7 +30,10 @@ export const DEFAULT_SETTINGS = Object.freeze({
 
   doesSyncNoteBody: true,
   doesSyncProject: false,
+  doesCollapseEmptyLines: false,
+  doesAddNewlineAfterSectionHeading: false,
   doesAddNewlineBeforeHeadings: false,
+  doesAddNewlineAfterHeadings: false,
   isSyncEnabled: false,
   syncInterval: DEFAULT_SYNC_FREQUENCY_SECONDS,
   sectionHeading: DEFAULT_SECTION_HEADING,
@@ -54,7 +60,14 @@ export class ThingsLogbookSettingsTab extends PluginSettingTab {
     this.addSectionHeadingSetting();
     this.addTagPrefixSetting();
     this.addCanceledMarkSetting();
+
+    this.containerEl.createEl("h4", {
+      text: "Empty Lines",
+    });
+    this.addDoesCollapseEmptyLinesSetting();
+    this.addDoesAddNewlineAfterSectionHeadingSetting();
     this.addDoesAddNewlineBeforeHeadingsSetting();
+    this.addDoesAddNewlineAfterHeadingsSetting();
 
     this.containerEl.createEl("h3", {
       text: "Sync",
@@ -158,6 +171,30 @@ export class ThingsLogbookSettingsTab extends PluginSettingTab {
         });
   }
 
+  addDoesCollapseEmptyLinesSetting(): void {
+    new Setting(this.containerEl)
+        .setName("Collapse empty lines")
+        .setDesc("Merge consecutive empty lines into a single empty line")
+        .addToggle((toggle) => {
+          toggle.setValue(this.plugin.options.doesCollapseEmptyLines);
+          toggle.onChange(async (doesCollapseEmptyLines) => {
+            this.plugin.writeOptions({ doesCollapseEmptyLines });
+          });
+        });
+  }
+
+  addDoesAddNewlineAfterSectionHeadingSetting(): void {
+    new Setting(this.containerEl)
+        .setName("Empty line after section heading")
+        .setDesc("Insert an empty line after the section heading")
+        .addToggle((toggle) => {
+          toggle.setValue(this.plugin.options.doesAddNewlineAfterSectionHeading);
+          toggle.onChange(async (doesAddNewlineAfterSectionHeading) => {
+            this.plugin.writeOptions({ doesAddNewlineAfterSectionHeading });
+          });
+        });
+  }
+
   addDoesAddNewlineBeforeHeadingsSetting(): void {
     new Setting(this.containerEl)
         .setName("Empty line before headings")
@@ -166,6 +203,18 @@ export class ThingsLogbookSettingsTab extends PluginSettingTab {
           toggle.setValue(this.plugin.options.doesAddNewlineBeforeHeadings);
           toggle.onChange(async (doesAddNewlineBeforeHeadings) => {
             this.plugin.writeOptions({ doesAddNewlineBeforeHeadings });
+          });
+        });
+  }
+
+  addDoesAddNewlineAfterHeadingsSetting(): void {
+    new Setting(this.containerEl)
+        .setName("Empty line after headings")
+        .setDesc("When grouping tasks with headings by area or project, add an empty line after that heading")
+        .addToggle((toggle) => {
+          toggle.setValue(this.plugin.options.doesAddNewlineAfterHeadings);
+          toggle.onChange(async (doesAddNewlineAfterHeadings) => {
+            this.plugin.writeOptions({ doesAddNewlineAfterHeadings });
           });
         });
   }
